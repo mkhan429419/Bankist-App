@@ -185,6 +185,24 @@ btnTransfer.addEventListener("click", function (e) {
   }
 });
 
+// findIndex method: array methods => returns index of found element, not element itself
+
+btnClose.addEventListener("click", function (e) {
+  e.preventDefault();
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    // similar to indexOf
+    const index = accounts.findIndex(
+      (acc) => acc.username === currentAccount.username // return boolean value
+    );
+    accounts.splice(index, 1); // array mutated
+    containerApp.style.opacity = 0;
+  }
+  inputClosePin.value = inputCloseUsername.value = "";
+});
+
 // filter method
 // allows for chaining, unlike forEach loop
 const deposits = movements.filter(function (mov) {

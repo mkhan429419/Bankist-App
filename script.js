@@ -87,15 +87,15 @@ const displayMovements = function (movements) {
 // reduce method: one single value
 // callback fxn: (accumalator, current, index, array) like a snowball
 
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce(
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce(
     function (acc, cur) {
       return acc + cur;
     },
     0
     // initial value of accumalator
   );
-  labelBalance.textContent = `${balance}€`;
+  labelBalance.textContent = `${acc.balance}€`;
 };
 
 const calcDisplaySummary = function (account) {
@@ -133,6 +133,15 @@ const createUsernames = function (accs) {
 
 createUsernames(accounts);
 
+const updateUI = function (acc) {
+  // display movements
+  displayMovements(acc.movements);
+  // display balance
+  calcDisplayBalance(acc);
+  // display summary
+  calcDisplaySummary(acc);
+};
+
 let currentAccount;
 
 //Event Handler
@@ -152,14 +161,30 @@ btnLogin.addEventListener("click", function (e) {
     // clear input fields
     inputLoginPin.value = inputLoginUsername.value = "";
     inputLoginPin.blur();
-    // display movements
-    displayMovements(currentAccount.movements);
-    // display balance
-    calcDisplayBalance(currentAccount.movements);
-    // display summary
-    calcDisplaySummary(currentAccount);
+    //update ui
+    updateUI(currentAccount);
   }
 });
+
+btnTransfer.addEventListener("click", function (e) {
+  e.preventDefault();
+  const ammount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    (acc) => acc.username === inputTransferTo.value
+  );
+  inputTransferAmount.value = inputTransferTo.value = "";
+  if (
+    ammount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= ammount &&
+    receiverAcc?.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-ammount);
+    receiverAcc.movements.push(ammount);
+    updateUI(currentAccount);
+  }
+});
+
 // filter method
 // allows for chaining, unlike forEach loop
 const deposits = movements.filter(function (mov) {
